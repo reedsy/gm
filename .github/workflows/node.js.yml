@@ -31,7 +31,7 @@ jobs:
       with:
         # Use PAT instead of default Github token, because the default
         # token deliberately will not trigger another workflow run
-        token: ${{ secrets.REEDSY_BOT_PERSONAL_ACCESS_TOKEN }}
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
     # Separate checkout action for pull_request_target, which needs to
     # explicitly checkout the SHA
     - name: Checkout (pull request)
@@ -41,7 +41,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
         # Use PAT instead of default Github token, because the default
         # token deliberately will not trigger another workflow run
-        token: ${{ secrets.REEDSY_BOT_PERSONAL_ACCESS_TOKEN }}
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
