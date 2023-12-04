@@ -6,7 +6,7 @@ name: Node.js CI
 on:
   push:
     branches: [ "master" ]
-  pull_request:
+  pull_request_target:
     branches: [ "master" ]
 
 jobs:
@@ -18,29 +18,37 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
-        node-version: [14.x, 16.x, 18.x]
+        os: [ubuntu-latest]
+        node-version: [20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - name: Install GraphicsMagic and Imagemagick on Ubuntu
-      if: contains(matrix.os, 'ubuntu')
+    - name: Install GraphicsMagic and Imagemagick
       run: sudo apt-get install -y imagemagick graphicsmagick
-    - name: Install GraphicsMagic and Imagemagick on Windows
-      if: contains(matrix.os, 'windows')
-      run: choco install -y imagemagick graphicsmagick
-    - uses: actions/checkout@v3
+    - name: Checkout (push)
+      if: ${{ github.event_name == 'push' }}
+      uses: actions/checkout@v3
+      with:
+        # Use PAT instead of default Github token, because the default
+        # token deliberately will not trigger another workflow run
+        token: ${{ secrets.REEDSY_BOT_PERSONAL_ACCESS_TOKEN }}
+    # Separate checkout action for pull_request_target, which needs to
+    # explicitly checkout the SHA
+    - name: Checkout (pull request)
+      if: ${{ github.event_name == 'pull_request_target' }}
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        # Use PAT instead of default Github token, because the default
+        # token deliberately will not trigger another workflow run
+        token: ${{ secrets.REEDSY_BOT_PERSONAL_ACCESS_TOKEN }}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm i
-    - name: Run tests on Windows
-      if: contains(matrix.os, 'windows')
-      shell: cmd
-      run: |
-        call refreshenv
-        npm test
-    - name: Run tests on Ubuntu
-      if: contains(matrix.os, 'ubuntu')
+    - name: Run tests
       run: npm test
+    - name: Tag
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      run: ./tag.sh
