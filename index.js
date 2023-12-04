@@ -27,7 +27,7 @@ function gm (source, height, color) {
   EventEmitter.call(this);
 
   this._options = {};
-  this.options(this.__proto__._options);
+  this.options(Object.getPrototypeOf(this)._options);
 
   this.data = {};
   this._in = [];
@@ -103,7 +103,7 @@ gm.subClass = function subClass (options) {
     parent.call(this, source, height, color);
   }
 
-  gm.prototype.__proto__ = parent.prototype;
+  Object.setPrototypeOf(gm.prototype, parent.prototype)
   gm.prototype._options = {};
   gm.prototype.options(options);
 
