@@ -1,7 +1,7 @@
 {
   "name": "@reedsy/gm",
   "description": "GraphicsMagick and ImageMagick for node.js",
-  "version": "1.25.0-reedsy-1.0.0",
+  "version": "1.25.0-reedsy-1.0.1",
   "author": "Aaron Heckmann <aaron.heckmann+github@gmail.com>",
   "keywords": [
     "graphics",
@@ -29,7 +29,7 @@
   "main": "./index",
   "scripts": {
     "security": "npm audit",
-    "test": "npm run security && npm run test-integration",
+    "test": "npm run security && NODE_OPTIONS=\"--disable-proto=throw\" npm run test-integration",
     "test-integration": "node test/ --integration",
     "test-unit": "node test/"
   },
